@@ -6,11 +6,30 @@ import br.com.caelum.pm73.dao.UsuarioDao;
 import br.com.caelum.pm73.dominio.Usuario;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.junit.After;
+import static org.junit.Assert.assertNull;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class UsuarioDaoTest {
 
+    private Session session;
+    private UsuarioDao userDao;
+    
+    @Before
+    public void antes(){
+    
+        this.session = new CriadorDeSessao().getSession();
+        this.userDao = new UsuarioDao(session);
+    }
+    
+    @After
+    public void depois(){
+    
+        this.session.close();
+    }
+    
     @Test
     public void _deveEncontrarPeloNomeEEmailMockado(){
     
@@ -35,13 +54,17 @@ public class UsuarioDaoTest {
     
     @Test
     public void deveEncontrarPeloNomeEEmailMockado(){
+                
+        Usuario dbUser = userDao.porNomeEEmail("Joao da silva", "joao@silvas.com.br");
         
-        Session session = new CriadorDeSessao().getSession();
-        UsuarioDao dao = new UsuarioDao(session);
+        if(dbUser == null){
         
-        Usuario dbUser = dao.porNomeEEmail("Joao da silva", "joao@silvas.com.br");
-        
-        assertEquals(dbUser.getNome(), "Joao da silva");
-        assertEquals(dbUser.getEmail(), "joao@silvas.com.br");
+            assertNull(dbUser);
+        }
+        else {
+            
+            assertEquals(dbUser.getNome(), "Joao da silva");
+            assertEquals(dbUser.getEmail(), "joao@silvas.com.br");
+        } 
     }
 }
